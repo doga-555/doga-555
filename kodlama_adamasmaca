@@ -1,0 +1,156 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <locale.h>
+
+// Türkçe kelime listesi
+char *kelimeler[] = {
+    "kalem",
+    "kitap",
+    "masa",
+    "bilgisayar",
+    "telefon",
+    "okul",
+    "defter",
+    "pencere",
+    "sandalye",
+    "televizyon"
+};
+
+// Adam asma çizimini gösteren fonksiyon
+void adamCiz(int kalanHak) {
+    printf("\n");
+    switch(kalanHak) {
+        case 6:
+            printf("  +---+\n");
+            printf("      |\n");
+            printf("      |\n");
+            printf("      |\n");
+            printf("      |\n");
+            printf("=========\n");
+            break;
+        case 5:
+            printf("  +---+\n");
+            printf("  O   |\n");
+            printf("      |\n");
+            printf("      |\n");
+            printf("      |\n");
+            printf("=========\n");
+            break;
+        case 4:
+            printf("  +---+\n");
+            printf("  O   |\n");
+            printf("  |   |\n");
+            printf("      |\n");
+            printf("      |\n");
+            printf("=========\n");
+            break;
+        case 3:
+            printf("  +---+\n");
+            printf("  O   |\n");
+            printf(" /|   |\n");
+            printf("      |\n");
+            printf("      |\n");
+            printf("=========\n");
+            break;
+        case 2:
+            printf("  +---+\n");
+            printf("  O   |\n");
+            printf(" /|\\  |\n");
+            printf("      |\n");
+            printf("      |\n");
+            printf("=========\n");
+            break;
+        case 1:
+            printf("  +---+\n");
+            printf("  O   |\n");
+            printf(" /|\\  |\n");
+            printf(" /    |\n");
+            printf("      |\n");
+            printf("=========\n");
+            break;
+        case 0:
+            printf("  +---+\n");
+            printf("  O   |\n");
+            printf(" /|\\  |\n");
+            printf(" / \\  |\n");
+            printf("      |\n");
+            printf("=========\n");
+            break;
+    }
+}
+
+// Oyun durumunu ekrana çizme
+void oyunDurumunuGoster(char tahminEdilen[], int kalanHak, char tahminEdilenHarfler[]) {
+    adamCiz(kalanHak);
+    printf("\nKalan hak: %d\n", kalanHak);
+    printf("Kelime: %s\n", tahminEdilen);
+    printf("Tahmin edilen harfler: %s\n", tahminEdilenHarfler);
+}
+
+int main() {
+    setlocale(LC_ALL, "Turkish");
+    srand(time(NULL));
+    
+    // Rastgele kelime seç
+    int kelimeSayisi = sizeof(kelimeler) / sizeof(kelimeler[0]);
+    int secilenIndex = rand() % kelimeSayisi;
+    char* dogruKelime = kelimeler[secilenIndex];
+    
+    int uzunluk = strlen(dogruKelime);
+    char tahminEdilen[20];
+    char tahminEdilenHarfler[26] = "";
+    int kalanHak = 6;
+    
+    // Başlangıçta kelimenin tüm harfleri _ ile gösterilir
+    for(int i = 0; i < uzunluk; i++) {
+        tahminEdilen[i] = '_';
+    }
+    tahminEdilen[uzunluk] = '\0';
+    
+    printf("Adam Asmaca Oyununa Hoşgeldiniz!\n");
+    
+    while(kalanHak > 0) {
+        oyunDurumunuGoster(tahminEdilen, kalanHak, tahminEdilenHarfler);
+        
+        char tahmin;
+        printf("\nBir harf girin: ");
+        scanf(" %c", &tahmin);
+        
+        // Daha önce tahmin edilmiş mi kontrol et
+        if(strchr(tahminEdilenHarfler, tahmin) != NULL) {
+            printf("Bu harfi zaten tahmin ettiniz!\n");
+            continue;
+        }
+        
+        // Yeni tahmin edilen harfi listeye ekle
+        int len = strlen(tahminEdilenHarfler);
+        tahminEdilenHarfler[len] = tahmin;
+        tahminEdilenHarfler[len + 1] = '\0';
+        
+        int dogruTahmin = 0;
+        for(int i = 0; i < uzunluk; i++) {
+            if(dogruKelime[i] == tahmin) {
+                tahminEdilen[i] = tahmin;
+                dogruTahmin = 1;
+            }
+        }
+        
+        if(!dogruTahmin) {
+            kalanHak--;
+            printf("Yanlış tahmin!\n");
+        }
+        
+        // Kazanma kontrolü
+        if(strcmp(tahminEdilen, dogruKelime) == 0) {
+            oyunDurumunuGoster(tahminEdilen, kalanHak, tahminEdilenHarfler);
+            printf("\nTebrikler, kazandınız! Kelime: %s\n", dogruKelime);
+            return 0;
+        }
+    }
+    
+    oyunDurumunuGoster(tahminEdilen, kalanHak, tahminEdilenHarfler);
+    printf("\nÜzgünüm, kaybettiniz. Doğru kelime: %s\n", dogruKelime);
+    return 0;
+}
